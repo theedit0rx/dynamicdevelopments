@@ -67,7 +67,7 @@ export default function ExperienceLab(){
         <small>{current.eyebrow}</small>
         <h3>{current.title}</h3>
         <p>{current.desc}</p>
-        <div><button type="button">Start a project <ArrowUpRight size={14}/></button><span>DESIGN / CODE / MOTION</span></div>
+        <div><button type="button" onClick={()=>document.getElementById('contact')?.scrollIntoView({behavior:'smooth'})}>Start a project <ArrowUpRight size={14}/></button><span>DESIGN / CODE / MOTION</span></div>
        </div>
        <div className="lab-ui-stack" aria-hidden="true">
         <article className="lab-card card-main"><span>01</span><strong>{current.label}</strong><i/></article>

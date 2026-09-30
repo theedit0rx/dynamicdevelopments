@@ -7,12 +7,16 @@ import Logo from './components/Logo';
 const Scene=lazy(()=>import('./components/StudioScene'));
 const EMAIL='dynamicwebdeveloping@gmail.com';
 const nav=[['Work','work'],['Services','services'],['Skills','skills'],['Pricing','pricing']];
+const HERO_WORDS=['Built different.','Feels alive.','Moves smarter.','Converts better.'];
+const CAPABILITIES=['Strategy','Design','Development','3D Experiences','AI & Automation'];
+const RAIL=[['home','00','Intro'],['work','01','Work'],['services','02','Services'],['skills','03','Skills'],['pricing','05','Pricing'],['contact','08','Contact']];
 const money=(n:number)=>'₹'+n.toLocaleString('en-IN');
 function Kicker({n,children}:{n:string;children:React.ReactNode}){return <div className="eyebrow"><span>{n} /</span>{children}</div>}
 export default function App(){
  const [menu,setMenu]=useState(false),[mode,setMode]=useState(0),[moving,setMoving]=useState(!window.matchMedia('(prefers-reduced-motion: reduce)').matches),[service,setService]=useState(0),[filter,setFilter]=useState('All'),[project,setProject]=useState<typeof work[number]|null>(null);
  const [type,setType]=useState(0),[pages,setPages]=useState(1),[design,setDesign]=useState(1),[selected,setSelected]=useState<string[]>([]),[calc,setCalc]=useState(false);
  const [form,setForm]=useState({name:'',business:'',email:'',phone:'',type:'Business Website',budget:'₹10,000–₹25,000',description:'',deadline:''}),[prepared,setPrepared]=useState(false),[copyStatus,setCopyStatus]=useState('');
+ const [heroWord,setHeroWord]=useState(0),[activeSection,setActiveSection]=useState('home');
  const dialog=useRef<HTMLDialogElement>(null),closeButton=useRef<HTMLButtonElement>(null);
  const colors=['#c8ff32','#50e3e1','#a991ff'];
  const low=Math.round((options[type].base*pages+extras.filter(x=>selected.includes(x.name)).reduce((s,x)=>s+x.price,0))*design/500)*500,high=Math.round(low*1.3/500)*500;
@@ -36,6 +40,65 @@ export default function App(){
   scroll();
   return()=>{window.removeEventListener('pointermove',move);window.removeEventListener('scroll',scroll)};
  },[]);
+ /* kinetic experience layer */
+ useEffect(()=>{
+  if(!moving)return;
+  const id=window.setInterval(()=>setHeroWord(v=>(v+1)%HERO_WORDS.length),2400);
+  return()=>window.clearInterval(id);
+ },[moving]);
+ useEffect(()=>{
+  const root=document.querySelector<HTMLElement>('.studio');
+  if(!root)return;
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine=window.matchMedia('(pointer: fine)').matches;
+
+  const revealTargets=Array.from(root.querySelectorAll<HTMLElement>('.section,.process-section,.about-band,.faq-section,.contact-section'));
+  revealTargets.forEach(el=>el.classList.add('reveal-block'));
+  const revealObserver=new IntersectionObserver(entries=>{
+   entries.forEach(entry=>{if(entry.isIntersecting)(entry.target as HTMLElement).classList.add('is-visible')});
+  },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+  revealTargets.forEach(el=>revealObserver.observe(el));
+
+  const sectionObserver=new IntersectionObserver(entries=>{
+   const visible=entries.filter(x=>x.isIntersecting).sort((x,y)=>y.intersectionRatio-x.intersectionRatio)[0];
+   if(visible?.target?.id)setActiveSection(visible.target.id);
+  },{threshold:[.2,.35,.55],rootMargin:'-18% 0px -48% 0px'});
+  RAIL.forEach(([id])=>{const el=document.getElementById(id);if(el)sectionObserver.observe(el)});
+
+  const cleanups:(()=>void)[]=[];
+  if(fine&&!reduced){
+   const tiltEls=Array.from(root.querySelectorAll<HTMLElement>('.hero-experiment,.work-card,.skills-bento article,.plan,.process-grid article'));
+   tiltEls.forEach(el=>{
+    el.classList.add('dynamic-tilt');
+    const move=(e:PointerEvent)=>{
+     const r=el.getBoundingClientRect();
+     const px=(e.clientX-r.left)/r.width-.5;
+     const py=(e.clientY-r.top)/r.height-.5;
+     el.style.setProperty('--tilt-x',`${(-py*7).toFixed(2)}deg`);
+     el.style.setProperty('--tilt-y',`${(px*8).toFixed(2)}deg`);
+     el.style.setProperty('--shine-x',`${((px+.5)*100).toFixed(1)}%`);
+     el.style.setProperty('--shine-y',`${((py+.5)*100).toFixed(1)}%`);
+    };
+    const leave=()=>{el.style.setProperty('--tilt-x','0deg');el.style.setProperty('--tilt-y','0deg')};
+    el.addEventListener('pointermove',move);el.addEventListener('pointerleave',leave);
+    cleanups.push(()=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerleave',leave)});
+   });
+
+   const magnets=Array.from(root.querySelectorAll<HTMLElement>('.action,.nav-contact,.text-link,.back-top'));
+   magnets.forEach(el=>{
+    el.classList.add('magnetic');
+    const move=(e:PointerEvent)=>{
+     const r=el.getBoundingClientRect();
+     el.style.setProperty('--mag-x',`${((e.clientX-(r.left+r.width/2))*.12).toFixed(1)}px`);
+     el.style.setProperty('--mag-y',`${((e.clientY-(r.top+r.height/2))*.12).toFixed(1)}px`);
+    };
+    const leave=()=>{el.style.setProperty('--mag-x','0px');el.style.setProperty('--mag-y','0px')};
+    el.addEventListener('pointermove',move);el.addEventListener('pointerleave',leave);
+    cleanups.push(()=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerleave',leave)});
+   });
+  }
+  return()=>{revealObserver.disconnect();sectionObserver.disconnect();cleanups.forEach(fn=>fn())};
+ },[]);
  const field=(key:keyof typeof form,value:string)=>{setForm(f=>({...f,[key]:value}));setPrepared(false)};
  function quote(name?:string){setForm(f=>({...f,type:name||options[type].name,budget:name==='Starter'?'₹10,000–₹25,000':name==='Growth'?'₹25,000–₹50,000':name==='Custom'?'Let’s discuss':`${money(low)}–${money(high)}`,description:name?`I'm interested in the ${name} package.`:`I'd like a ${options[type].name}. Estimated budget: ${money(low)}–${money(high)}. Pages: ${pages===1?'1–5':pages===1.35?'6–10':'10+'}. Features: ${selected.join(', ')||'Standard website features'}. Design: ${design===1?'Standard':design===1.25?'Premium':'Advanced interactive'}.`}));setPrepared(false);document.getElementById('contact')?.scrollIntoView({behavior:moving?'smooth':'auto'})}
  const brief=`Project inquiry — ${form.business||form.name}\n\nName: ${form.name}\nBusiness: ${form.business}\nEmail: ${form.email}\nPhone: ${form.phone}\nProject: ${form.type}\nBudget: ${form.budget}\nTimeline: ${form.deadline||'To discuss'}\n\n${form.description}`;
@@ -43,10 +106,11 @@ export default function App(){
  async function copy(){try{await navigator.clipboard.writeText(brief);setCopyStatus('Brief copied. Paste it into your email.')}catch{setCopyStatus('Select the brief below to copy it manually.')}}
  return <div className={`studio ${moving?'':'motion-paused'}`} style={{'--signal':colors[mode]} as React.CSSProperties}>
  <a className="skip" href="#main">Skip to content</a>
+ <nav className="scroll-rail" aria-label="Page progress">{RAIL.map(([id,n,label])=><a key={id} href={'#'+id} aria-current={activeSection===id?'true':undefined}><span>{n}</span><i/><b>{label}</b></a>)}</nav>
  <header className="studio-nav"><a href="#home" className="wordmark" aria-label="Dynamic Developments home"><Logo size={44} className="shrink-0"/><span>dynamic<span>developments</span></span></a><nav aria-label="Main navigation">{nav.map(([label,id])=><a key={id} href={'#'+id}>{label}</a>)}</nav><a className="nav-contact" href="#contact">Let’s talk <ArrowUpRight size={17}/></a><button className="menu-button" onClick={()=>setMenu(!menu)} aria-expanded={menu} aria-controls="mobile-menu" aria-label={menu?'Close menu':'Open menu'}>{menu?<X/>:<Menu/>}</button></header>
  {menu&&<nav id="mobile-menu" className="mobile-menu" aria-label="Mobile navigation">{[...nav,['About','about'],['Contact','contact']].map(([label,id],i)=><a key={id} href={'#'+id} onClick={()=>setMenu(false)}><small>0{i+1}</small>{label}<ArrowUpRight/></a>)}</nav>}
- <main id="main"><section id="home" className="hero-studio wrap"><div className="hero-copy"><p className="availability"><i/>INDEPENDENT DIGITAL STUDIO · INDIA</p><h1>Your next<br/>big thing.<br/><span>Built different.</span></h1><p className="hero-desc">Websites that turn heads.<br/>Digital products that move businesses forward.</p><div className="hero-actions"><a href="#contact" className="action primary">Build with us <ArrowUpRight size={19}/></a><a href="#work" className="text-link">Explore our work <ArrowRight size={17}/></a></div><p className="hero-footnote">CUSTOM WEBSITES FROM <strong>₹10,000</strong><span>DESIGN + DEVELOPMENT + AI</span></p></div><div className="hero-experiment"><div className="experiment-top"><span>EXPERIMENT_001</span><span><i/>LIVE 3D</span></div><Suspense fallback={<div className="scene-fallback">DD</div>}><Scene color={colors[mode]} moving={moving}/></Suspense><div className="scene-tag tag-a"><Code2 size={16}/>ENGINEERED TO ENGAGE</div><div className="scene-tag tag-b"><span>◈</span>FROM IDEA TO INTERACTIVE</div><div className="experiment-bottom"><span>DRAG TO EXPLORE</span><div className="scene-controls">{['Lime','Cyan','Violet'].map((label,i)=><button key={label} style={{background:colors[i]}} aria-label={label+' scene color'} aria-pressed={mode===i} onClick={()=>setMode(i)}/>)}<button className="motion-toggle" aria-label={moving?'Pause motion':'Play motion'} onClick={()=>setMoving(!moving)}>{moving?<Pause size={14}/>:<Play size={14}/>}</button></div></div></div></section>
- <div className="capability-strip"><div className="wrap"><span>Strategy</span><i>✳</i><span>Design</span><i>✳</i><span>Development</span><i>✳</i><span>3D Experiences</span><i>✳</i><span>AI & Automation</span></div></div>
+ <main id="main"><section id="home" className="hero-studio wrap"><div className="hero-copy"><p className="availability"><i/>INDEPENDENT DIGITAL STUDIO · INDIA</p><h1 aria-label="Your next big thing. Built different.">Your next<br/>big thing.<br/><span className="hero-kinetic" aria-hidden="true"><span key={heroWord}>{HERO_WORDS[heroWord]}</span></span></h1><p className="hero-desc">Websites that turn heads.<br/>Digital products that move businesses forward.</p><div className="hero-actions"><a href="#contact" className="action primary">Build with us <ArrowUpRight size={19}/></a><a href="#work" className="text-link">Explore our work <ArrowRight size={17}/></a></div><p className="hero-footnote">CUSTOM WEBSITES FROM <strong>₹10,000</strong><span>DESIGN + DEVELOPMENT + AI</span></p></div><div className="hero-experiment"><div className="experiment-top"><span>EXPERIMENT_001</span><span><i/>LIVE 3D</span></div><Suspense fallback={<div className="scene-fallback">DD</div>}><Scene color={colors[mode]} moving={moving}/></Suspense><div className="scene-tag tag-a"><Code2 size={16}/>ENGINEERED TO ENGAGE</div><div className="scene-tag tag-b"><span>◈</span>FROM IDEA TO INTERACTIVE</div><div className="experiment-bottom"><span>DRAG TO EXPLORE</span><div className="scene-controls">{['Lime','Cyan','Violet'].map((label,i)=><button key={label} style={{background:colors[i]}} aria-label={label+' scene color'} aria-pressed={mode===i} onClick={()=>setMode(i)}/>)}<button className="motion-toggle" aria-label={moving?'Pause motion':'Play motion'} onClick={()=>setMoving(!moving)}>{moving?<Pause size={14}/>:<Play size={14}/>}</button></div></div></div></section>
+ <div className="capability-strip" aria-label="Capabilities"><div className="capability-marquee">{[0,1].map(copy=><div className="capability-track" key={copy} aria-hidden={copy===1?'true':undefined}>{CAPABILITIES.map((item,i)=><span key={item}><b>{item}</b><i>{i%2?'✦':'✳'}</i></span>)}</div>)}</div></div>
  <section id="work" className="wrap section"><Kicker n="01">SELECTED WORK</Kicker><div className="section-heading"><h2>Proof of imagination.<br/><span>Built into reality.</span></h2><p>Real websites we have designed and built.<br/>Explore the live projects below.</p></div><div className="filter-row" aria-label="Filter projects">{['All','Education','E-commerce'].map(x=><button key={x} aria-pressed={filter===x} onClick={()=>setFilter(x)}>{x}</button>)}</div><div className="work-grid">{work.filter(x=>filter==='All'||x.category===filter).map(p=><button className={'work-card '+(p.id==='physics'?'featured-work':'')} key={p.id} onClick={()=>setProject(p)} aria-label={`View ${p.name}`}><div className="work-visual"><Preview kind={p.visual}/><span className="project-open"><ArrowUpRight size={22}/></span></div><div className="work-meta"><div><small>{p.tag} / {p.category.toUpperCase()}</small><h3>{p.name}</h3><p>{p.description}</p></div><span>0{work.indexOf(p)+1}</span></div></button>)}</div></section>
  <section id="services" className="services-surface"><div className="wrap section"><Kicker n="02">WHAT WE DO</Kicker><div className="services-layout"><div className="services-intro"><h2>A small studio.<br/><span>A wide lens.</span></h2><p>From your first website to your next ambitious platform. We connect the design, code and systems that make it work.</p><a href="#contact" className="text-link">Find your starting point <ArrowUpRight size={18}/></a><div className="service-orb" aria-hidden="true"><span>IDEA</span><i/><strong>→</strong><span>IMPACT</span></div></div><div className="service-list">{services.map((s,i)=><article key={s.title} className={service===i?'service-expanded':''}><button onClick={()=>setService(service===i?-1:i)} aria-expanded={service===i} aria-controls={'service-'+i}><span className="service-number">0{i+1}</span><span><small>{s.sub}</small><strong>{s.title}</strong></span>{service===i?<Minus size={20}/>:<Plus size={20}/>}</button>{service===i&&<div id={'service-'+i} className="service-detail"><p>{s.text}</p><ul>{s.items.map(x=><li key={x}>{x}</li>)}</ul></div>}</article>)}</div></div><p className="industry-note">FOR STARTUPS, LOCAL BUSINESSES, CREATORS, INSTITUTES & GROWING BRANDS.</p></div></section>
  <section id="skills" className="wrap section"><Kicker n="03">OUR EDGE</Kicker><div className="section-heading"><h2>Human creativity.<br/><span>Technical depth.</span></h2><p>A thoughtful interface is only the beginning.<br/>Here’s what powers the experience.</p></div><div className="skills-bento"><article className="ai-feature"><span className="mini-label">INTELLIGENCE, APPLIED</span><div className="ai-graphic" aria-hidden="true"><i/><i/><i/><Bot size={54}/></div><h3>AI Expert<span>Built for the useful stuff.</span></h3><p>AI assistants, connected workflows and intelligent interfaces that turn repetitive tasks into time for better work.</p><div className="skill-tags">{['AI integration','AI agents','Prompt engineering','Workflow automation'].map(x=><span key={x}>{x}</span>)}</div><a href="#contact" className="text-link">Let’s build something smarter <ArrowUpRight size={18}/></a></article><article className="engineering-feature"><Code2 size={28}/><h3>Strong foundations.<br/>Room to grow.</h3><p>Responsive interfaces, structured data and thoughtful integrations.</p><div className="tech-grid">{['React','TypeScript','Next.js','Tailwind','Supabase','Firebase','Vercel','APIs'].map(x=><span key={x}>{x}</span>)}</div></article><article className="motion-feature"><Layers3 size={26}/><div><h3>A little more dimension.</h3><p>Three.js · WebGL · Motion design</p></div><span className="wire-cube" aria-hidden="true"/></article></div></section>

@@ -1,85 +1,36 @@
-import {useRef,useState,type CSSProperties} from 'react';
-import {ArrowUpRight,Bot,Boxes,Gauge,MousePointer2,ShoppingBag,Sparkles} from 'lucide-react';
-
+import {useEffect,useRef,useState,type CSSProperties} from 'react';
+import {ArrowUpRight,ArrowRight,Bot,Boxes,Check,MousePointer2,ShoppingBag,Sparkles,Play,RotateCcw,Plus,Minus} from 'lucide-react';
 const MODES=[
- {id:'cinematic',label:'Cinematic',eyebrow:'STORY-FIRST EXPERIENCE',title:'Launch with impact.',desc:'Editorial scale, depth and motion for brands that need a memorable first impression.',accent:'#c8ff32',Icon:Sparkles},
- {id:'commerce',label:'Commerce',eyebrow:'CONVERSION-FLOW EXPERIENCE',title:'Make discovery feel effortless.',desc:'Product storytelling, clearer hierarchy and interaction patterns that keep the path to action obvious.',accent:'#50e3e1',Icon:ShoppingBag},
- {id:'ai',label:'AI',eyebrow:'INTELLIGENT INTERFACE',title:'Make the product feel responsive.',desc:'Useful AI surfaces, guided actions and dynamic feedback without turning the interface into a chatbot demo.',accent:'#a991ff',Icon:Bot},
- {id:'depth',label:'3D',eyebrow:'SPATIAL EXPERIENCE',title:'Add dimension with purpose.',desc:'3D, light and perspective used where they improve understanding, attention or product presence.',accent:'#6fb7ff',Icon:Boxes}
+ {id:'cinematic',label:'Cinematic',eyebrow:'01 / A BRAND WITH PRESENCE',title:'Make an entrance.',desc:'A bold visual identity. A story that moves. An experience with your name on it.',accent:'#c8ff32',Icon:Sparkles},
+ {id:'commerce',label:'Commerce',eyebrow:'02 / DISCOVERY TO DESIRE',title:'Good taste. Great flow.',desc:'Explore a product, pick a finish and try the bag. Every detail brings the next step closer.',accent:'#50e3e1',Icon:ShoppingBag},
+ {id:'ai',label:'AI',eyebrow:'03 / LESS BUSYWORK',title:'Let the workflow work.',desc:'Run a sample inquiry through a transparent, three-step automation preview.',accent:'#a991ff',Icon:Bot},
+ {id:'depth',label:'3D',eyebrow:'04 / THINK IN DIMENSIONS',title:'A different perspective.',desc:'Take an interface apart. See how structure, design and interaction come together.',accent:'#6fb7ff',Icon:Boxes}
 ];
-
-export default function ExperienceLab(){
- const [mode,setMode]=useState(0);
- const [motion,setMotion]=useState(72);
- const preview=useRef<HTMLDivElement>(null);
+export default function ExperienceLab({moving,onChoose}:{moving:boolean;onChoose:(direction:string)=>void}){
+ const [mode,setMode]=useState(0),[finish,setFinish]=useState(0),[bag,setBag]=useState(0),[step,setStep]=useState(0),[running,setRunning]=useState(false),[depth,setDepth]=useState(50);
+ const preview=useRef<HTMLDivElement>(null),tabs=useRef<(HTMLButtonElement|null)[]>([]);
  const current=MODES[mode];
- const speed=12-motion*.075,depth=10+motion*.22;
- const style={'--lab-accent':current.accent,'--lab-motion':String(motion/100),'--lab-speed':`${speed.toFixed(2)}s`,'--lab-speed-slow':`${(speed*1.35).toFixed(2)}s`,'--lab-depth':`${depth.toFixed(1)}px`,'--lab-depth-sm':`${(depth*.6).toFixed(1)}px`,'--lab-depth-lg':`${(depth*1.2).toFixed(1)}px`} as CSSProperties;
-
- const move=(e:React.PointerEvent<HTMLDivElement>)=>{
-  const el=preview.current;if(!el)return;
-  const r=el.getBoundingClientRect();
-  const x=(e.clientX-r.left)/r.width;
-  const y=(e.clientY-r.top)/r.height;
-  el.style.setProperty('--lab-x',`${(x*100).toFixed(1)}%`);
-  el.style.setProperty('--lab-y',`${(y*100).toFixed(1)}%`);
-  el.style.setProperty('--lab-rx',`${((.5-y)*5).toFixed(2)}deg`);
-  el.style.setProperty('--lab-ry',`${((x-.5)*6).toFixed(2)}deg`);
- };
- const reset=()=>{const el=preview.current;if(!el)return;el.style.setProperty('--lab-rx','0deg');el.style.setProperty('--lab-ry','0deg')};
-
- return <section id="lab" className="experience-lab wrap section" style={style}>
-  <div className="eyebrow"><span>04 /</span>LIVE EXPERIENCE LAB</div>
-  <div className="lab-heading">
-   <div><h2>Don’t just show it.<br/><span>Let people feel it.</span></h2></div>
-   <p>Switch directions, change the motion level and move your pointer across the preview. This is the kind of interaction system we can build around a real product or brand.</p>
-  </div>
-
-  <div className="lab-shell">
-   <aside className="lab-controls">
-    <div className="lab-control-title"><MousePointer2 size={17}/><span>Choose a direction</span></div>
-    <div className="lab-mode-list" role="tablist" aria-label="Experience direction">
-     {MODES.map((item,i)=><button key={item.id} role="tab" aria-selected={mode===i} onClick={()=>setMode(i)}>
-      <span className="lab-mode-icon"><item.Icon size={17}/></span>
-      <span><small>0{i+1}</small><strong>{item.label}</strong></span>
-      <i/>
-     </button>)}
+ useEffect(()=>{if(!running)return;const id=window.setTimeout(()=>{setStep(s=>s+1);if(step>=2)setRunning(false)},750);return()=>clearTimeout(id)},[running,step]);
+ const chooseMode=(i:number)=>{setMode(i);setRunning(false);setStep(0)};
+ const style={'--lab-accent':current.accent,'--lab-speed':'9s','--lab-speed-slow':'14s','--lab-depth':'24px','--lab-depth-sm':'15px','--lab-depth-lg':'30px','--product-color':['#b8dbc8','#ccc0ed','#d8a983'][finish],'--layer-gap':`${depth*.7}px`} as CSSProperties;
+ const move=(e:React.PointerEvent<HTMLDivElement>)=>{if(!moving||e.pointerType!=='mouse')return;const el=preview.current;if(!el)return;const r=el.getBoundingClientRect();const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;el.style.setProperty('--lab-rx',`${((.5-y)*3).toFixed(2)}deg`);el.style.setProperty('--lab-ry',`${((x-.5)*4).toFixed(2)}deg`)};
+ const reset=()=>{preview.current?.style.setProperty('--lab-rx','0deg');preview.current?.style.setProperty('--lab-ry','0deg')};
+ return <section id="lab" className="experience-lab wrap section lab-v2" style={style}>
+  <div className="eyebrow"><span>04 /</span>THE PLAYGROUND</div>
+  <div className="lab-heading"><h2>Less explaining.<br/><span>More experiencing.</span></h2><p>Four directions. One studio.<br/>Go ahead — change something. This is a small taste of what we could build together.</p></div>
+  <div className="lab-v2-shell">
+   <div className="lab-v2-tabs" role="tablist" aria-label="Experience direction">{MODES.map((item,i)=><button ref={el=>{tabs.current[i]=el}} key={item.id} id={`tab-${item.id}`} role="tab" aria-controls="experience-panel" tabIndex={mode===i?0:-1} aria-selected={mode===i} onClick={()=>chooseMode(i)} onKeyDown={e=>{let next=i;if(e.key==='ArrowRight')next=(i+1)%4;else if(e.key==='ArrowLeft')next=(i+3)%4;else if(e.key==='Home')next=0;else if(e.key==='End')next=3;else return;e.preventDefault();chooseMode(next);tabs.current[next]?.focus()}}><item.Icon size={18}/><span>{item.label}</span><small>0{i+1}</small></button>)}</div>
+   <div className="lab-v2-content" role="tabpanel" id="experience-panel" aria-labelledby={`tab-${current.id}`} tabIndex={0}>
+    <div className="lab-v2-copy"><span className="mini-label">{current.eyebrow}</span><h3>{current.title}</h3><p>{current.desc}</p><button className="action primary" onClick={()=>onChoose(current.label)}>Build this direction <ArrowUpRight size={17}/></button><small className="demo-disclosure">INTERACTIVE CONCEPT · TRY IT BELOW</small></div>
+    <div ref={preview} className={`demo-stage demo-${current.id}`} onPointerMove={move} onPointerLeave={reset}>
+     <div className="demo-chrome"><span><i/><i/><i/></span><small>studio / {current.id}</small><MousePointer2 size={13}/></div>
+     {mode===0&&<div className="cinematic-demo"><span className="demo-edition">DYNAMIC®<small>DIGITAL EXPERIENCES / VOL. 01</small></span><div className="kinetic-sphere" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div><h4>Ordinary?<br/><em>Never.</em></h4><button onClick={()=>onChoose('Cinematic')} aria-label="Choose cinematic design"><ArrowUpRight size={28}/></button><div className="cinema-bottom"><span>EXPERIMENTAL THINKING.<br/>EXCEPTIONAL EXECUTION.</span><span>EST. IN INDIA ↗</span></div></div>}
+     {mode===1&&<div className="commerce-demo"><div className="store-top"><strong>FORM / OBJECTS</strong><span aria-live="polite"><ShoppingBag size={14}/> Bag ({bag})</span></div><div className="product-scene" role="img" aria-label={['Sage','Lilac','Clay'][finish]+' sculptural table lamp'}><div className="lamp-shade"/><div className="lamp-stem"/><div className="lamp-base"/><div className="lamp-light"/></div><div className="product-info"><div><small>DESIGNED FOR SLOW LIVING</small><h4>The Arc Lamp</h4><span>Concept product · ₹2,400</span></div><div className="finish-picker" aria-label="Lamp finish">{['Sage','Lilac','Clay'].map((f,i)=><button key={f} aria-label={f+' finish'} aria-pressed={finish===i} style={{background:['#b8dbc8','#ccc0ed','#d8a983'][i]}} onClick={()=>setFinish(i)}/>)}</div></div><div className="demo-bag-actions"><button className="demo-add" onClick={()=>setBag(v=>Math.min(v+1,9))} disabled={bag>=9}><Plus size={15}/>{bag>=9?'Bag limit reached':'Add to demo bag'}</button>{bag>0&&<button className="demo-remove" onClick={()=>setBag(v=>Math.max(v-1,0))} aria-label="Remove one lamp"><Minus size={16}/></button>}</div><small className="demo-note">Design demo only. No checkout or real purchases.</small></div>}
+     {mode===2&&<div className="automation-demo"><div className="automation-head"><span><Bot size={22}/></span><div><strong>Inquiry assistant</strong><small>ILLUSTRATIVE WORKFLOW · NO AI API</small></div></div><div className="sample-inquiry">“I need a website for my café with a menu and table bookings.”</div><ol className="workflow-steps">{[['Understand the inquiry','Café website · Menu · Booking'],['Organize the scope','Website + menu + booking integration'],['Prepare the handoff','Brief ready for a human review']].map(([title,detail],i)=><li key={title} className={step>i?'complete':running&&step===i?'processing':''}><span>{step>i?<Check size={15}/>:String(i+1).padStart(2,'0')}</span><div><strong>{title}</strong><small>{step>i?detail:'Waiting for demo run'}</small></div></li>)}</ol><button className="demo-run" disabled={running} onClick={()=>{setStep(0);setRunning(true)}}>{step===3?<RotateCcw size={16}/>:<Play size={16}/>} {running?'Running sample…':step===3?'Run again':'Run sample workflow'}<ArrowRight size={16}/></button><span className="sr-only" role="status">{step===3?'Sample workflow complete. Brief ready for human review.':running?'Sample workflow running.':''}</span></div>}
+     {mode===3&&<div className="depth-demo"><div className="depth-stack" role="img" aria-label={`Interface layers separated at ${depth} percent`}><div className="depth-layer layer-code"><span>03 / ENGINEERING</span><pre>{'<Experience>\n  design="intentional"\n  built="for you"\n</Experience>'}</pre></div><div className="depth-layer layer-design"><span>02 / DESIGN SYSTEM</span><div><i/><i/><i/></div><b>Aa <small>Type / Color / Space</small></b></div><div className="depth-layer layer-interface"><span>01 / THE EXPERIENCE</span><strong>Made<br/>to move<span>↗</span></strong><i/></div></div><label className="depth-control" htmlFor="layer-depth"><span>Bring it together</span><output>{depth}%</output><input id="layer-depth" type="range" min="0" max="100" value={depth} onChange={e=>setDepth(Number(e.target.value))}/><small>Drag to separate the layers</small></label></div>}
     </div>
-    <div className="lab-motion-control">
-     <label htmlFor="motion-level"><span><Gauge size={16}/>Motion intensity</span><b>{motion}%</b></label>
-     <input id="motion-level" type="range" min="20" max="100" value={motion} onChange={e=>setMotion(Number(e.target.value))}/>
-     <div><span>Calm</span><span>Expressive</span></div>
-    </div>
-    <a className="action primary lab-cta" href="#contact">Build this direction <ArrowUpRight size={18}/></a>
-   </aside>
-
-   <div className="lab-stage-wrap">
-    <div className="lab-stage-meta"><span><i/>LIVE SYSTEM</span><b>{current.label.toUpperCase()} MODE</b></div>
-    <div ref={preview} className={`lab-preview lab-${current.id}`} onPointerMove={move} onPointerLeave={reset}>
-     <div className="lab-browser">
-      <div className="lab-browser-top"><div><i/><i/><i/></div><span>dynamic://experience-lab</span><b>LIVE</b></div>
-      <div className="lab-canvas">
-       <div className="lab-grid" aria-hidden="true"/>
-       <div className="lab-orbit orbit-a" aria-hidden="true"/>
-       <div className="lab-orbit orbit-b" aria-hidden="true"/>
-       <div className="lab-glow" aria-hidden="true"/>
-       <div className="lab-copy" aria-live="polite">
-        <small>{current.eyebrow}</small>
-        <h3>{current.title}</h3>
-        <p>{current.desc}</p>
-        <div><button type="button" onClick={()=>document.getElementById('contact')?.scrollIntoView({behavior:'smooth'})}>Start a project <ArrowUpRight size={14}/></button><span>DESIGN / CODE / MOTION</span></div>
-       </div>
-       <div className="lab-ui-stack" aria-hidden="true">
-        <article className="lab-card card-main"><span>01</span><strong>{current.label}</strong><i/></article>
-        <article className="lab-card card-side"><span>02</span><strong>Interaction</strong><i/></article>
-        <article className="lab-card card-mini"><span>03</span><strong>System</strong><i/></article>
-       </div>
-       <div className="lab-particles" aria-hidden="true">{Array.from({length:14},(_,i)=><i key={i}/>)}</div>
-      </div>
-     </div>
-    </div>
-    <div className="lab-stage-foot"><span>MOVE POINTER TO BEND THE SCENE</span><span>ADAPTIVE MOTION · RESPONSIVE · ACCESSIBLE</span></div>
    </div>
+   <div className="lab-v2-foot"><span><i/> BUILT TO BE EXPLORED</span><span>YOUR IDEA COULD BE NEXT <ArrowUpRight size={13}/></span></div>
   </div>
  </section>;
 }

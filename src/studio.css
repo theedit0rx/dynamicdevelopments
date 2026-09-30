@@ -600,7 +600,7 @@
   width:180px;height:180px;right:13%;top:19%;
   border-color:rgba(255,255,255,.09);
   animation-direction:reverse;
-  animation-duration:calc(var(--lab-speed) * 1.35);
+  animation-duration:var(--lab-speed-slow);
 }
 .lab-copy{
   position:absolute;left:7%;top:18%;width:min(48%,420px);z-index:4;
@@ -641,12 +641,12 @@
 }
 .card-side{
   width:48%;height:53%;right:0;top:25%;
-  transform:translateZ(calc(var(--lab-depth) * .6)) rotate(6deg);
+  transform:translateZ(var(--lab-depth-sm)) rotate(6deg);
   animation:lab-card-side var(--lab-speed) ease-in-out infinite;
 }
 .card-mini{
   width:40%;height:37%;left:22%;bottom:0;
-  transform:translateZ(calc(var(--lab-depth) * 1.2)) rotate(2deg);
+  transform:translateZ(var(--lab-depth-lg)) rotate(2deg);
   animation:lab-card-mini var(--lab-speed) ease-in-out infinite;
 }
 .lab-particles{position:absolute;inset:0;pointer-events:none}

@@ -707,3 +707,56 @@
   .lab-glow,.lab-orbit,.lab-card,.lab-particles i{animation:none!important}
   .lab-browser{transform:none!important}
 }
+
+
+/* ===== flagship finishing details ===== */
+.studio-nav>nav a{
+  position:relative;
+}
+.studio-nav>nav a::after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:-7px;
+  height:1px;
+  background:var(--signal);
+  transform:scaleX(0);
+  transform-origin:right;
+  transition:transform .28s ease;
+  box-shadow:0 0 8px color-mix(in srgb,var(--signal) 55%,transparent);
+}
+.studio-nav>nav a:hover::after,.studio-nav>nav a.is-active::after{
+  transform:scaleX(1);
+  transform-origin:left;
+}
+.studio-nav>nav a.is-active{color:#eef6ef}
+.dialog-highlights{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:18px 0 25px;
+}
+.dialog-highlights span{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border:1px solid #34473a;
+  border-radius:999px;
+  background:#0c1411;
+  color:#bac8be;
+  font:8px 'JetBrains Mono';
+  letter-spacing:.03em;
+}
+.dialog-highlights i{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--signal);
+  box-shadow:0 0 9px color-mix(in srgb,var(--signal) 60%,transparent);
+}
+.project-dialog{
+  box-shadow:0 40px 120px rgba(0,0,0,.58),0 0 80px color-mix(in srgb,var(--signal) 8%,transparent);
+}
+.project-dialog .dialog-content{
+  background:
+    radial-gradient(circle at 90% 0%,color-mix(in srgb,var(--signal) 6%,transparent),transparent 34%),
+    #101818;
+}

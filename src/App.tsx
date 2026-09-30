@@ -19,6 +19,23 @@ export default function App(){
  useEffect(()=>{if(project){dialog.current?.showModal();closeButton.current?.focus()}else dialog.current?.close()},[project]);
  useEffect(()=>{document.body.style.overflow=menu||project?'hidden':'';return()=>{document.body.style.overflow=''}},[menu,project]);
  useEffect(()=>{const fn=(e:KeyboardEvent)=>{if(e.key==='Escape')setMenu(false)};window.addEventListener('keydown',fn);return()=>window.removeEventListener('keydown',fn)},[]);
+ /* premium interaction layer */
+ useEffect(()=>{
+  const root=document.querySelector<HTMLElement>('.studio');
+  if(!root)return;
+  const move=(e:PointerEvent)=>{
+   root.style.setProperty('--mx',`${(e.clientX/window.innerWidth)*100}%`);
+   root.style.setProperty('--my',`${(e.clientY/window.innerHeight)*100}%`);
+  };
+  const scroll=()=>{
+   const max=document.documentElement.scrollHeight-window.innerHeight;
+   root.style.setProperty('--scroll',`${max>0?(window.scrollY/max)*100:0}%`);
+  };
+  window.addEventListener('pointermove',move,{passive:true});
+  window.addEventListener('scroll',scroll,{passive:true});
+  scroll();
+  return()=>{window.removeEventListener('pointermove',move);window.removeEventListener('scroll',scroll)};
+ },[]);
  const field=(key:keyof typeof form,value:string)=>{setForm(f=>({...f,[key]:value}));setPrepared(false)};
  function quote(name?:string){setForm(f=>({...f,type:name||options[type].name,budget:name==='Starter'?'₹10,000–₹25,000':name==='Growth'?'₹25,000–₹50,000':name==='Custom'?'Let’s discuss':`${money(low)}–${money(high)}`,description:name?`I'm interested in the ${name} package.`:`I'd like a ${options[type].name}. Estimated budget: ${money(low)}–${money(high)}. Pages: ${pages===1?'1–5':pages===1.35?'6–10':'10+'}. Features: ${selected.join(', ')||'Standard website features'}. Design: ${design===1?'Standard':design===1.25?'Premium':'Advanced interactive'}.`}));setPrepared(false);document.getElementById('contact')?.scrollIntoView({behavior:moving?'smooth':'auto'})}
  const brief=`Project inquiry — ${form.business||form.name}\n\nName: ${form.name}\nBusiness: ${form.business}\nEmail: ${form.email}\nPhone: ${form.phone}\nProject: ${form.type}\nBudget: ${form.budget}\nTimeline: ${form.deadline||'To discuss'}\n\n${form.description}`;

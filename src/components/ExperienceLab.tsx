@@ -13,7 +13,7 @@ export default function ExperienceLab(){
  const [motion,setMotion]=useState(72);
  const preview=useRef<HTMLDivElement>(null);
  const current=MODES[mode];
- const style={'--lab-accent':current.accent,'--lab-motion':String(motion/100)} as CSSProperties;
+ const style={'--lab-accent':current.accent,'--lab-motion':String(motion/100),'--lab-speed':`${(12-motion*.075).toFixed(2)}s`,'--lab-depth':`${(10+motion*.22).toFixed(1)}px`} as CSSProperties;
 
  const move=(e:React.PointerEvent<HTMLDivElement>)=>{
   const el=preview.current;if(!el)return;

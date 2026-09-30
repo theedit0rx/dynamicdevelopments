@@ -13,7 +13,8 @@ export default function ExperienceLab(){
  const [motion,setMotion]=useState(72);
  const preview=useRef<HTMLDivElement>(null);
  const current=MODES[mode];
- const style={'--lab-accent':current.accent,'--lab-motion':String(motion/100),'--lab-speed':`${(12-motion*.075).toFixed(2)}s`,'--lab-depth':`${(10+motion*.22).toFixed(1)}px`} as CSSProperties;
+ const speed=12-motion*.075,depth=10+motion*.22;
+ const style={'--lab-accent':current.accent,'--lab-motion':String(motion/100),'--lab-speed':`${speed.toFixed(2)}s`,'--lab-speed-slow':`${(speed*1.35).toFixed(2)}s`,'--lab-depth':`${depth.toFixed(1)}px`,'--lab-depth-sm':`${(depth*.6).toFixed(1)}px`,'--lab-depth-lg':`${(depth*1.2).toFixed(1)}px`} as CSSProperties;
 
  const move=(e:React.PointerEvent<HTMLDivElement>)=>{
   const el=preview.current;if(!el)return;

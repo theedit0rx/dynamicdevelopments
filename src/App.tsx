@@ -8,12 +8,14 @@ import ExperienceLab from './components/ExperienceLab';
 import ImmersiveHero,{SIGNALS} from './components/ImmersiveHero';
 import ProjectPortal from './components/ProjectPortal';
 import MotionShowcase from './components/MotionShowcase';
+import ScrollFilm from './components/ScrollFilm';
+import useScrollDirector from './components/useScrollDirector';
 import './flagship.css';
 const EMAIL='dynamicwebdeveloping@gmail.com';
 const nav=[['Work','work'],['Motion','motion'],['Services','services'],['Skills','skills'],['Lab','lab'],['Pricing','pricing']];
 
 const CAPABILITIES=['Strategy','Design','Development','3D Experiences','AI & Automation'];
-const RAIL=[['home','00','Intro'],['work','01','Work'],['motion','01B','Motion'],['services','02','Services'],['skills','03','Skills'],['lab','04','Lab'],['pricing','06','Pricing'],['contact','09','Contact']];
+const RAIL=[['home','00','Intro'],['cinema','00B','Story'],['work','01','Work'],['motion','01B','Motion'],['services','02','Services'],['skills','03','Skills'],['lab','04','Lab'],['pricing','06','Pricing'],['contact','09','Contact']];
 const money=(n:number)=>'₹'+n.toLocaleString('en-IN');
 function Kicker({n,children}:{n:string;children:React.ReactNode}){return <div className="eyebrow"><span>{n} /</span>{children}</div>}
 export default function App(){
@@ -22,6 +24,7 @@ export default function App(){
  const [form,setForm]=useState({name:'',business:'',email:'',phone:'',type:'Business Website',budget:'₹10,000–₹25,000',description:'',deadline:''}),[prepared,setPrepared]=useState(false),[copyStatus,setCopyStatus]=useState('');
  const [activeSection,setActiveSection]=useState('home');
  const dialog=useRef<HTMLDialogElement>(null),closeButton=useRef<HTMLButtonElement>(null);
+ useScrollDirector(moving);
  const colors=SIGNALS;
  const low=Math.round((options[type].base*pages+extras.filter(x=>selected.includes(x.name)).reduce((s,x)=>s+x.price,0))*design/500)*500,high=Math.round(low*1.3/500)*500;
  useEffect(()=>{if(project){dialog.current?.showModal();closeButton.current?.focus()}else dialog.current?.close()},[project]);
@@ -105,12 +108,14 @@ export default function App(){
  const mailto=`mailto:${EMAIL}?subject=${encodeURIComponent('Project inquiry — '+(form.business||form.name))}&body=${encodeURIComponent(brief)}`;
  async function copy(){try{await navigator.clipboard.writeText(brief);setCopyStatus('Brief copied. Paste it into your email.')}catch{setCopyStatus('Select the brief below to copy it manually.')}}
  return <div className={`studio ${moving?'':'motion-paused'}`} style={{'--signal':colors[mode]} as React.CSSProperties}>
+ <div className="cine-progress" aria-hidden="true"/>
  <a className="skip" href="#main">Skip to content</a>
  <nav className="scroll-rail" aria-label="Page progress">{RAIL.map(([id,n,label])=><a key={id} href={'#'+id} aria-current={activeSection===id?'true':undefined}><span>{n}</span><i/><b>{label}</b></a>)}</nav>
  <header className="studio-nav"><a href="#home" className="wordmark" aria-label="Dynamic Developments home"><Logo size={44} className="shrink-0"/><span>dynamic<span>developments</span></span></a><nav aria-label="Main navigation">{nav.map(([label,id])=><a key={id} href={'#'+id} className={activeSection===id?'is-active':''} aria-current={activeSection===id?'page':undefined}>{label}</a>)}</nav><a className="nav-contact" href="#contact">Let’s talk <ArrowUpRight size={17}/></a><button className="menu-button" onClick={()=>setMenu(!menu)} aria-expanded={menu} aria-controls="mobile-menu" aria-label={menu?'Close menu':'Open menu'}>{menu?<X/>:<Menu/>}</button></header>
  {menu&&<nav id="mobile-menu" className="mobile-menu" aria-label="Mobile navigation">{[...nav,['About','about'],['Contact','contact']].map(([label,id],i)=><a key={id} href={'#'+id} onClick={()=>setMenu(false)}><small>0{i+1}</small>{label}<ArrowUpRight/></a>)}</nav>}
  <main id="main"><ImmersiveHero moving={moving} onMotion={()=>setMoving(v=>!v)} mode={mode} onMode={setMode}/>
  <div className="capability-strip" aria-label="Capabilities"><div className="capability-marquee">{[0,1].map(copy=><div className="capability-track" key={copy} aria-hidden={copy===1?'true':undefined}>{CAPABILITIES.map((item,i)=><span key={item}><b>{item}</b><i>{i%2?'✦':'✳'}</i></span>)}</div>)}</div></div>
+ <ScrollFilm moving={moving}/>
  <MotionShowcase moving={moving}/>
  <ProjectPortal moving={moving} onOpen={setProject}/>
  <section id="services" className="services-surface"><div className="wrap section"><Kicker n="02">WHAT WE DO</Kicker><div className="services-layout"><div className="services-intro"><h2>A small studio.<br/><span>A wide lens.</span></h2><p>From your first website to your next ambitious platform. We connect the design, code and systems that make it work.</p><a href="#contact" className="text-link">Find your starting point <ArrowUpRight size={18}/></a><div className="service-orb" aria-hidden="true"><span>IDEA</span><i/><strong>→</strong><span>IMPACT</span></div></div><div className="service-list">{services.map((s,i)=><article key={s.title} className={service===i?'service-expanded':''}><button onClick={()=>setService(service===i?-1:i)} aria-expanded={service===i} aria-controls={'service-'+i}><span className="service-number">0{i+1}</span><span><small>{s.sub}</small><strong>{s.title}</strong></span>{service===i?<Minus size={20}/>:<Plus size={20}/>}</button>{service===i&&<div id={'service-'+i} className="service-detail"><p>{s.text}</p><ul>{s.items.map(x=><li key={x}>{x}</li>)}</ul></div>}</article>)}</div></div><p className="industry-note">FOR STARTUPS, LOCAL BUSINESSES, CREATORS, INSTITUTES & GROWING BRANDS.</p></div></section>

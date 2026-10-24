@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Lenis from 'lenis';
-import { ArrowUpRight, ArrowRight, ArrowDown, Check, ChevronDown, Code2, Menu, X, Pause, Play, MousePointer2, Layers3, Sparkles, Mail, Copy, MoveUpRight, Globe2, Bot, Palette, Rocket, ExternalLink } from 'lucide-react';
+import { ArrowUpRight, ArrowDown, Check, ChevronDown, Code2, Menu, X, Pause, Play, MousePointer2, Mail, Copy, MoveUpRight, Palette, Rocket, ExternalLink } from 'lucide-react';
 import Logo from './components/Logo';
 import HeroMachine from './components/HeroMachine';
 import { services, work, plans, faqs, options } from './components/StudioData';

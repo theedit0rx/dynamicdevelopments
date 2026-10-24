@@ -4,6 +4,7 @@ import Lenis from 'lenis';
 import { ArrowUpRight, ArrowDown, Check, ChevronDown, Code2, Menu, X, Pause, Play, MousePointer2, Mail, Copy, MoveUpRight, Palette, Rocket, ExternalLink } from 'lucide-react';
 import Logo from './components/Logo';
 import HeroMachine from './components/HeroMachine';
+import MagicScene from './components/MagicScene';
 import { services, work, plans, faqs, options } from './components/StudioData';
 import './relaunch.css';
 
@@ -64,20 +65,18 @@ const ACTS=[
 function JourneyChapter({act,index,moving}:{act:typeof ACTS[number],index:number,moving:boolean}) {
   const chapter=useRef<HTMLElement>(null);
   const {scrollYProgress}=useScroll({target:chapter,offset:['start end','end start']});
-  const opacity=useTransform(scrollYProgress,[0,.28,.74,1],[.52,1,1,.6]);
-  const textY=useTransform(scrollYProgress,[0,1],[75,-45]);
-  const scale=useTransform(scrollYProgress,[0,.35,1],[.93,1,1.04]);
-  const orbit=useTransform(scrollYProgress,[0,1],[-60,70]);
   return <section ref={chapter} className={'dd-journey-chapter dd-journey-chapter-'+index} aria-labelledby={'journey-title-'+index}>
     <div className="dd-journey-panel">
-      <div className="dd-journey-meta"><span>THE PROCESS / CHAPTER {act.id}</span><span>SCROLL TO EXPLORE <ArrowDown size={13}/></span></div>
-      <motion.div className="dd-journey-orb" style={moving?{y:orbit}:undefined} aria-hidden="true"><span>✳</span></motion.div>
-      <motion.div className="dd-journey-copy" style={moving?{opacity,y:textY,scale}:undefined}>
-        <div className="dd-journey-label">0{index+1} / 03 — {act.label}</div>
-        <h2 id={'journey-title-'+index}>{act.title}</h2>
-        <p>{act.desc}</p>
-        <div className="dd-journey-detail"><i>↗</i> {act.detail}</div>
-      </motion.div>
+      <div className="dd-journey-meta"><span>THE PROCESS / CHAPTER {act.id}</span><span>THE SCENE MOVES AS YOU SCROLL <ArrowDown size={13}/></span></div>
+      <div className="dd-journey-inner">
+        <div className="dd-journey-copy">
+          <div className="dd-journey-label">0{index+1} / 03 — {act.label}</div>
+          <h2 id={'journey-title-'+index}>{act.title}</h2>
+          <p>{act.desc}</p>
+          <div className="dd-journey-detail"><i>↗</i> {act.detail}</div>
+        </div>
+        <MagicScene index={index} progress={scrollYProgress} moving={moving}/>
+      </div>
       <div className="dd-journey-floor"><span>IDEA → DESIGN → BUILD → LAUNCH</span><span>{act.id} / 03</span></div>
     </div>
   </section>;

@@ -20,3 +20,10 @@
 @media(max-width:760px){.studio .cine-enter{filter:none;transform:translate3d(0,23px,0);transition-duration:.65s}.studio .cine-progress{height:2px}}
 @media(prefers-reduced-motion:reduce){.studio .cine-enter{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}.studio .cine-progress{display:none}.studio.cinema-enabled .portal-world,.studio.cinema-enabled .service-orb,.studio.cinema-enabled .ai-graphic{transform:none!important}}
 .studio.motion-paused .cine-progress{display:none}
+
+
+/* Scroll-linked hero layering — wrapper never interferes with the WebGL canvas. */
+.flagship-hero .hero-canvas-parallax{position:relative;min-width:0;width:100%;transform-origin:50% 40%;will-change:transform}
+.flagship-hero .hero-canvas-parallax .workstation{width:100%}
+.flagship-hero .hero-copy{will-change:transform,opacity}
+@media(max-width:760px){.flagship-hero .hero-canvas-parallax{will-change:auto}.flagship-hero .hero-copy{will-change:auto}}

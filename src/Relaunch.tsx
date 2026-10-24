@@ -7,6 +7,7 @@ import HeroMachine from './components/HeroMachine';
 import MagicScene from './components/MagicScene';
 import { services, work, plans, faqs, options } from './components/StudioData';
 import './relaunch.css';
+import './magic.css';
 
 const EMAIL = 'dynamicwebdeveloping@gmail.com';
 const LINKS = [['Work','work'],['Services','services'],['Approach','approach'],['Pricing','pricing']] as const;

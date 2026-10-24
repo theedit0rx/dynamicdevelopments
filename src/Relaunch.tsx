@@ -4,20 +4,21 @@ import Lenis from 'lenis';
 import { ArrowUpRight, ArrowDown, Check, ChevronDown, Code2, Menu, X, Pause, Play, MousePointer2, Mail, Copy, MoveUpRight, Palette, Rocket, ExternalLink } from 'lucide-react';
 import Logo from './components/Logo';
 import HeroMachine from './components/HeroMachine';
-import MagicScene from './components/MagicScene';
+import CinematicScene from './components/CinematicScene';
 import { services, work, plans, faqs, options } from './components/StudioData';
 import './relaunch.css';
 import './magic.css';
+import './premium.css';
 
 const EMAIL = 'dynamicwebdeveloping@gmail.com';
 const LINKS = [['Work','work'],['Services','services'],['Approach','approach'],['Pricing','pricing']] as const;
 const THUMBNAILS: Record<string,string> = { physics:'/physics-portfolio.jpg', vmart:'/vmart-portfolio.jpg', bit:'/bit-portfolio.jpg' };
-const COLORS: Record<string,string> = { physics:'#c8ff32', vmart:'#b2a7ff', bit:'#72cafa' };
+const COLORS: Record<string,string> = { physics:'#7dafea', vmart:'#b8a9d9', bit:'#99c8de' };
 const SMOOTH = [0.22,1,0.36,1] as const;
 
 function Reveal({ children, className = '', delay = 0 }: {children:ReactNode,className?:string,delay?:number}) {
   const reduced = useReducedMotion();
-  return <motion.div className={className} initial={reduced ? false : {opacity:0,y:44,filter:'blur(7px)'}} whileInView={{opacity:1,y:0,filter:'blur(0px)'}} viewport={{once:true,amount:.13,margin:'0px 0px -5% 0px'}} transition={{duration:.82,delay,ease:SMOOTH}}>{children}</motion.div>;
+  return <motion.div className={className} initial={reduced ? false : {opacity:0,y:24}} whileInView={{opacity:1,y:0}} viewport={{once:true,amount:.13,margin:'0px 0px -5% 0px'}} transition={{duration:.76,delay,ease:SMOOTH}}>{children}</motion.div>;
 }
 function Eyebrow({number,children}:{number:string,children:ReactNode}) {
   return <span className="dd-eyebrow"><i>{number}</i><span>{children}</span></span>;
@@ -40,7 +41,7 @@ function Hero({moving}:{moving:boolean}) {
   const {scrollYProgress}=useScroll({target:ref,offset:['start start','end start']});
   const headY=useTransform(scrollYProgress,[0,1],[0,-90]);
   const sceneY=useTransform(scrollYProgress,[0,1],[0,110]);
-  const sceneRotate=useTransform(scrollYProgress,[0,1],[0,8]);
+  const sceneRotate=useTransform(scrollYProgress,[0,1],[0,0]);
   const fade=useTransform(scrollYProgress,[0,.8,1],[1,1,.25]);
   return <section className="dd-hero" id="home" ref={ref}>
     <div className="dd-hero-decoration" aria-hidden="true">01 / CREATIVE ENGINEERING STUDIO</div>
@@ -50,14 +51,14 @@ function Hero({moving}:{moving:boolean}) {
       <Reveal delay={.1}><p className="dd-hero-lead">Beautiful websites. Useful digital products. Thoughtful AI. <strong>Built to work brilliantly — and feel different.</strong></p><div className="dd-hero-ctas"><a className="dd-button dd-button-lime" href="#work">Explore our work <ArrowUpRight size={19}/></a><a className="dd-text-link" href="#services">What we can build <ArrowDown size={18}/></a></div></Reveal>
     </motion.div>
     <motion.div className="dd-hero-stage" style={moving?{y:sceneY,rotate:sceneRotate}:undefined}>
-      <div className="dd-stage-border" aria-hidden="true"><span>DD / EXPERIMENT 001</span><span>INTERACTIVE OBJECT ↗</span></div>
+      <div className="dd-stage-border" aria-hidden="true"><span>DD / VISUAL IDENTITY</span><span>DESIGNED WITH INTENTION ↗</span></div>
       <HeroMachine playing={moving}/>
     </motion.div>
-    <div className="dd-hero-bottom"><span>DESIGN · CODE · 3D · AI</span><span>SCROLL TO EXPLORE <ArrowDown size={15}/></span><span>EST. IN INDIA / WORLDWIDE WEB</span></div>
+    <div className="dd-hero-bottom"><span>DESIGN · CODE · 3D · AI</span><span>SCROLL INTO THE STORY <ArrowDown size={15}/></span><span>EST. IN INDIA / WORLDWIDE WEB</span></div>
   </section>;
 }
 const TICKER=['WEB DESIGN','CREATIVE DEVELOPMENT','INTERACTIVE 3D','AI & AUTOMATION','EXPERIENCES THAT MOVE'];
-function Ticker() { return <div className="dd-ticker" aria-label="Web design, creative development, interactive 3D, AI and automation"><div className="dd-ticker-track">{[0,1,2].map(i=><div className="dd-ticker-set" aria-hidden={i>0} key={i}>{TICKER.map((x,j)=><span key={x}>{x}<b>{j%2?'✦':'✳'}</b></span>)}</div>)}</div></div>; }
+function Ticker() { return <div className="dd-ticker" aria-label="Web design, creative development, interactive 3D, AI and automation"><div className="dd-ticker-track">{[0,1,2].map(i=><div className="dd-ticker-set" aria-hidden={i>0} key={i}>{TICKER.map((x,j)=><span key={x}>{x}<b>{j%2?'↗':'✳'}</b></span>)}</div>)}</div></div>; }
 const ACTS=[
   {id:'01',label:'START WITH THE IDEA',title:'Tell us what you imagine.',desc:'A business website, an online store, a learning platform, or a completely new product. We start by understanding what you actually need.',detail:'We listen. We plan. We make the complicated feel simple.',color:'#c8ff32'},
   {id:'02',label:'TURN IT INTO SOMETHING REAL',title:'Watch your idea come alive.',desc:'We connect clear design with real engineering: layouts, interactions, content, responsive code, and practical integrations.',detail:'Design and development happen together — not in silos.',color:'#b9afff'},
@@ -76,7 +77,7 @@ function JourneyChapter({act,index,moving}:{act:typeof ACTS[number],index:number
           <p>{act.desc}</p>
           <div className="dd-journey-detail"><i>↗</i> {act.detail}</div>
         </div>
-        <MagicScene index={index} progress={scrollYProgress} moving={moving}/>
+        <CinematicScene index={index} progress={scrollYProgress} moving={moving}/>
       </div>
       <div className="dd-journey-floor"><span>IDEA → DESIGN → BUILD → LAUNCH</span><span>{act.id} / 03</span></div>
     </div>
@@ -84,7 +85,7 @@ function JourneyChapter({act,index,moving}:{act:typeof ACTS[number],index:number
 }
 function Story({moving}:{moving:boolean}) {
   return <section id="story" className="dd-journey" aria-label="How your idea becomes a finished experience">
-    <div className="dd-journey-intro"><span>WHAT HAPPENS WHEN YOU WORK WITH US?</span><strong>From your first idea<br/>to the finished thing. ↓</strong></div>
+    <div className="dd-journey-intro"><span>WHAT HAPPENS WHEN YOU WORK WITH US?</span><strong>From the first spark<br/>to something real. ↓</strong></div>
     {ACTS.map((act,i)=><JourneyChapter act={act} index={i} moving={moving} key={act.id}/>)}
   </section>;
 }

@@ -1,0 +1,22 @@
+/* Site-wide scroll choreography. Applied only when motion is enabled. */
+.studio .cine-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:150;pointer-events:none;transform:scaleX(var(--cine-progress,0));transform-origin:0 50%;background:linear-gradient(90deg,#c8ff32,var(--signal,#c8ff32),#ddfcce);box-shadow:0 1px 18px color-mix(in srgb,var(--signal) 30%,transparent)}
+.studio .cine-enter{opacity:0;filter:blur(7px);transform:translate3d(0,40px,0);transition:opacity .85s cubic-bezier(.22,1,.36,1),transform 1.15s cubic-bezier(.22,1,.36,1),filter .9s cubic-bezier(.22,1,.36,1);transition-delay:var(--cine-delay,0ms)}
+.studio .cine-enter.cine-is-in{opacity:1;filter:blur(0);transform:translate3d(0,0,0)}
+.studio.cinema-enabled .portal-world{transform:translate3d(0,var(--cine-y,0px),0);transition:transform .14s linear}
+.studio.cinema-enabled .service-orb{transform:translate3d(0,var(--cine-y,0px),0)}
+.studio.cinema-enabled .ai-graphic{transform:translate3d(0,var(--cine-y,0px),0)}
+.studio.cinema-enabled .motion-star{transform:translate3d(0,var(--cine-y,0px),0)}
+.studio.cinema-enabled .footer-word:not(.cine-enter){transform:translate3d(0,var(--cine-y,0px),0)}
+.studio.cinema-enabled .capability-strip{position:relative;isolation:isolate;box-shadow:0 25px 55px color-mix(in srgb,var(--signal) 15%,transparent)}
+.studio.cinema-enabled .studio-nav{border-bottom-color:color-mix(in srgb,var(--signal) 20%,#ffffff0e)}
+.studio.cinema-enabled .services-surface{background:radial-gradient(ellipse at 12% 10%,color-mix(in srgb,var(--signal) 6%,transparent),transparent 60%),#101719}
+.studio.cinema-enabled .plan-highlight{box-shadow:0 20px 80px color-mix(in srgb,var(--signal) 11%,transparent)}
+.studio.cinema-enabled .portal-heading h2,.studio.cinema-enabled .section-heading h2,.studio.cinema-enabled .services-intro h2{transition-duration:1.05s}
+.studio.cinema-enabled .skills-bento article{transition-duration:1.05s}
+.studio.cinema-enabled .service-list article{transition-duration:.9s}
+.studio.cinema-enabled .faq-section details{transition-duration:.9s}
+.studio.cinema-enabled .studio-footer{position:relative}
+@media(hover:hover) and (pointer:fine){.studio.cinema-enabled .work-card:hover{box-shadow:0 34px 85px #0007}.studio.cinema-enabled .plan:hover{box-shadow:0 35px 90px #0006;transition:box-shadow .3s,transform .3s}}
+@media(max-width:760px){.studio .cine-enter{filter:none;transform:translate3d(0,23px,0);transition-duration:.65s}.studio .cine-progress{height:2px}}
+@media(prefers-reduced-motion:reduce){.studio .cine-enter{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}.studio .cine-progress{display:none}.studio.cinema-enabled .portal-world,.studio.cinema-enabled .service-orb,.studio.cinema-enabled .ai-graphic{transform:none!important}}
+.studio.motion-paused .cine-progress{display:none}

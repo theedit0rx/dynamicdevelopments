@@ -4,7 +4,9 @@ import Logo from './Logo';
 
 type Direction='left'|'right'|'top'|'bottom';
 function FlyingPiece({children,from,progress,order=0,moving,className=''}:{children:React.ReactNode,from:Direction,progress:MotionValue<number>,order?:number,moving:boolean,className?:string}) {
- const start=.12+order*.021,stop=.35+order*.023,out=.79+order*.009,end=.95+order*.007;
+ // Reserve the entrance for the STICKY viewport. With a 168–192svh chapter,
+ // pinning begins around scroll progress .36; early animation was occurring offscreen.
+ const start=.31+order*.012,stop=.51+order*.017,out=.73+order*.004,end=.94+order*.009;
  const dx=from==='left'?-440:from==='right'?440:0;
  const dy=from==='top'?-380:from==='bottom'?390:0;
  const x=useTransform(progress,[start,stop,out,end],[dx,0,0,-dx*.48]);
@@ -24,8 +26,8 @@ function BrowserWindow(){return <div className="dd-magic-browser" aria-hidden="t
  </div>}
 
 export default function MagicScene({index,progress,moving}:{index:number,progress:MotionValue<number>,moving:boolean}){
- const lift=useTransform(progress,[0,.36,.76,1],[55,0,0,-32]);
- const orbit=useTransform(progress,[0,1],[-65,95]);
+ const lift=useTransform(progress,[.29,.52,.73,.96],[55,0,0,-24]);
+ const orbit=useTransform(progress,[.29,.72],[-65,95]);
  if(index===0)return <div className="dd-magic-stage dd-magic-stage-idea" aria-label="Four creative brief cards fly in from different sides and form a project plan">
   <motion.div className="dd-magic-halo" style={moving?{y:orbit}:undefined} aria-hidden="true"/>
   <motion.div className="dd-magic-idea-center" style={moving?{y:lift}:undefined} aria-hidden="true"><div className="dd-magic-center-icon"><Sparkles size={27}/></div><small>EVERYTHING BEGINS WITH</small><b>YOUR IDEA<span>✳</span></b><i>LET'S MAKE IT REAL</i></motion.div>

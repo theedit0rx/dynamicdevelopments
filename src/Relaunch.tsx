@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Lenis from 'lenis';
 import { ArrowUpRight, ArrowDown, Check, ChevronDown, Code2, Menu, X, Pause, Play, MousePointer2, Mail, Copy, MoveUpRight, Palette, Rocket, ExternalLink } from 'lucide-react';
 import Logo from './components/Logo';
@@ -61,33 +61,31 @@ const ACTS=[
   {id:'02',label:'TURN IT INTO SOMETHING REAL',title:'Watch your idea come alive.',desc:'We connect clear design with real engineering: layouts, interactions, content, responsive code, and practical integrations.',detail:'Design and development happen together — not in silos.',color:'#b9afff'},
   {id:'03',label:'LAUNCH WITH PURPOSE',title:'Make your mark online.',desc:'A finished digital experience you can show the world, use on your phone, and grow with. No mystery — just purposeful work.',detail:'Tested, refined and ready for real people.',color:'#80dbeb'}
 ];
-function Story({moving}:{moving:boolean}) {
-  const ref=useRef<HTMLElement>(null);
-  const reduced=useReducedMotion();
-  const scroll=useScroll({target:ref,offset:['start start','end end']});
-  const progress=useSpring(scroll.scrollYProgress,{stiffness:115,damping:28,mass:.26});
-  const p0=useTransform(progress,[0,.20,.30,.39],[1,1,1,0]);
-  const p1=useTransform(progress,[.29,.4,.55,.68],[0,1,1,0]);
-  const p2=useTransform(progress,[.62,.73,1],[0,1,1]);
-  const s0=useTransform(progress,[0,.34],[1,1.08]);
-  const s1=useTransform(progress,[.3,.7],[.9,1.08]);
-  const s2=useTransform(progress,[.63,1],[.9,1.04]);
-  const [active,setActive]=useState(0);
-  useMotionValueEvent(progress,'change',v=>{const next=v<.35?0:v<.69?1:2;setActive(old=>old===next?old:next)});
-  const anim=moving&&!reduced;
-  return <section id="story" ref={ref} className={'dd-story'+(anim?'':' dd-story-static')}>
-    <div className="dd-story-pin">
-      <div className="dd-story-top"><span>HOW AN IDEA BECOMES AN EXPERIENCE</span><span>THREE CHAPTERS / ONE STUDIO</span></div>
-      <div className="dd-story-visual" aria-hidden="true"><div className="dd-story-orbit"/><div className="dd-story-cross">+</div></div>
-      {ACTS.map((act,i)=><motion.div key={act.id} className={'dd-story-act dd-story-act-'+i} style={anim?{opacity:[p0,p1,p2][i],scale:[s0,s1,s2][i],'--act-color':act.color} as any:{'--act-color':act.color} as any} aria-hidden={anim&&active!==i}>
-        <span className="dd-story-kicker">CHAPTER {act.id} / {act.label}</span>
-        <h2>{act.title}</h2>
+function JourneyChapter({act,index,moving}:{act:typeof ACTS[number],index:number,moving:boolean}) {
+  const chapter=useRef<HTMLElement>(null);
+  const {scrollYProgress}=useScroll({target:chapter,offset:['start end','end start']});
+  const opacity=useTransform(scrollYProgress,[0,.28,.74,1],[.52,1,1,.6]);
+  const textY=useTransform(scrollYProgress,[0,1],[75,-45]);
+  const scale=useTransform(scrollYProgress,[0,.35,1],[.93,1,1.04]);
+  const orbit=useTransform(scrollYProgress,[0,1],[-60,70]);
+  return <section ref={chapter} className={'dd-journey-chapter dd-journey-chapter-'+index} aria-labelledby={'journey-title-'+index}>
+    <div className="dd-journey-panel">
+      <div className="dd-journey-meta"><span>THE PROCESS / CHAPTER {act.id}</span><span>SCROLL TO EXPLORE <ArrowDown size={13}/></span></div>
+      <motion.div className="dd-journey-orb" style={moving?{y:orbit}:undefined} aria-hidden="true"><span>✳</span></motion.div>
+      <motion.div className="dd-journey-copy" style={moving?{opacity,y:textY,scale}:undefined}>
+        <div className="dd-journey-label">0{index+1} / 03 — {act.label}</div>
+        <h2 id={'journey-title-'+index}>{act.title}</h2>
         <p>{act.desc}</p>
-        <div className="dd-story-detail"><span>✳</span>{act.detail}</div>
-        <span className="dd-story-ghost" aria-hidden="true">{act.id}</span>
-      </motion.div>)}
-      <div className="dd-story-steps"><span>0{active+1} / 03</span><div className="dd-story-step-track"><motion.div style={{scaleX:anim?progress:1}}/></div><span>KEEP SCROLLING <ArrowDown size={13}/></span></div>
+        <div className="dd-journey-detail"><i>↗</i> {act.detail}</div>
+      </motion.div>
+      <div className="dd-journey-floor"><span>IDEA → DESIGN → BUILD → LAUNCH</span><span>{act.id} / 03</span></div>
     </div>
+  </section>;
+}
+function Story({moving}:{moving:boolean}) {
+  return <section id="story" className="dd-journey" aria-label="How your idea becomes a finished experience">
+    <div className="dd-journey-intro"><span>WHAT HAPPENS WHEN YOU WORK WITH US?</span><strong>From your first idea<br/>to the finished thing. ↓</strong></div>
+    {ACTS.map((act,i)=><JourneyChapter act={act} index={i} moving={moving} key={act.id}/>)}
   </section>;
 }
 function ProjectCard({project,index,moving}:{project:typeof work[number],index:number,moving:boolean}) {
